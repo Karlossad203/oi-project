@@ -1,23 +1,64 @@
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowRight, Check, ChevronDown, ChevronUp, Gift, Heart, Menu, Minus, Plus, ShieldCheck, ShoppingBag, Sparkles, Star, Truck, X } from "lucide-react";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
-});
+export const Route = createFileRoute("/")({ component: ChristmasStore });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+const products = [
+  { id: "compacta", height: "1 metro", price: 38.90, old: 59.90, tag: "PEQUENOS ESPAÇOS", description: "Um toque natalino cheio de charme para qualquer cantinho.", image: "https://images.unsplash.com/photo-1544273677-c433136021d4?auto=format&fit=crop&w=900&q=85", size: "compact" },
+  { id: "classica", height: "1,50 metros", price: 58.90, old: 89.90, tag: "A QUERIDINHA", description: "O equilíbrio perfeito para reunir todo mundo ao redor.", image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=900&q=85", size: "medium", featured: true },
+  { id: "imponente", height: "1,80 metros", price: 98.90, old: 149.90, tag: "PRESENÇA MARCANTE", description: "Mais altura, mais encanto e um cenário inesquecível.", image: "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=85", size: "tall" },
+];
+const money = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function ChristmasStore() {
+  const [cart, setCart] = useState<Record<string, number>>({});
+  const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState<number | null>(0);
+  const [customer, setCustomer] = useState({ name: "", city: "", note: "" });
+  const items = useMemo(() => products.filter(p => cart[p.id]).map(p => ({ ...p, qty: cart[p.id] })), [cart]);
+  const total = items.reduce((sum, p) => sum + p.price * p.qty, 0);
+  const count = Object.values(cart).reduce((sum, n) => sum + n, 0);
+  const add = (id: string) => setCart(c => ({ ...c, [id]: (c[id] || 0) + 1 }));
+  const change = (id: string, delta: number) => setCart(c => { const next = { ...c, [id]: (c[id] || 0) + delta }; if (next[id] <= 0) delete next[id]; return next; });
+  const orderText = () => {
+    const lines = items.map(p => `• Árvore de Natal ${p.height} — ${p.qty} un. — ${money(p.price * p.qty)}`).join("\n");
+    return `Olá! Quero fazer um pedido:\n\n${lines}\n\nTotal dos produtos: ${money(total)}\nNome: ${customer.name}\nCidade/UF: ${customer.city}\nObservações: ${customer.note || "Não informado"}\n\nPode me informar as opções de pagamento e entrega?`;
+  };
+  const checkout = () => { if (!customer.name.trim() || !customer.city.trim() || !items.length) return; window.open("https://wa.me/?text=" + encodeURIComponent(orderText()), "_blank", "noopener,noreferrer"); };
+
+  return <div className="store-shell">
+    <div className="announcement"><Sparkles size={14}/> A magia do Natal começa em casa <span>•</span> Escolha sua árvore favorita</div>
+    <header className="site-header">
+      <a className="brand" href="#inicio" aria-label="Natal em Casa - início"><span className="brand-mark">✳</span><span>NATAL<span className="brand-light">EM CASA</span><small>UM NATAL CHEIO DE ENCANTO</small></span></a>
+      <nav className={mobileOpen ? "main-nav nav-open" : "main-nav"}><a href="#colecao" onClick={() => setMobileOpen(false)}>Nossa coleção</a><a href="#beneficios" onClick={() => setMobileOpen(false)}>Por que escolher</a><a href="#duvidas" onClick={() => setMobileOpen(false)}>Dúvidas</a></nav>
+      <div className="header-actions"><button className="cart-button" onClick={() => setCartOpen(true)} aria-label="Abrir sacola"><ShoppingBag size={19}/><span>Sacola</span><b>{count}</b></button><button className="mobile-toggle" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Abrir menu">{mobileOpen ? <X/> : <Menu/>}</button></div>
+    </header>
+
+    <main>
+      <section className="hero" id="inicio">
+        <div className="hero-copy"><div className="eyebrow"><span/> A ÉPOCA MAIS ESPECIAL DO ANO</div><h1>O encanto do Natal<br/> começa <em>na sua casa.</em></h1><p>Crie memórias que ficam para sempre. Encontre a árvore perfeita para transformar seu espaço em um cenário cheio de luz, carinho e magia.</p><div className="hero-actions"><a className="button button-gold" href="#colecao">Escolher minha árvore <ArrowRight size={17}/></a><span className="hero-note"><Star size={15} fill="currentColor"/> 3 tamanhos para celebrar</span></div><div className="hero-proof"><div className="proof-avatars"><span>✦</span><span>❄</span><span>✧</span></div><span>Um detalhe especial faz toda a diferença.</span></div></div>
+        <div className="hero-visual"><div className="hero-image-wrap"><img src="https://images.unsplash.com/photo-1544273677-c433136021d4?auto=format&fit=crop&w=1400&q=90" alt="Árvore de Natal decorada em uma sala aconchegante"/><div className="image-glow"/></div><div className="floating-note"><span className="note-icon">✧</span><div><strong>Seu Natal, do seu jeito</strong><small>Escolha o tamanho ideal</small></div></div><div className="hero-stamp">FELIZ<br/>NATAL <span>✳</span></div></div>
+        <div className="hero-snow snow-one">✦</div><div className="hero-snow snow-two">✧</div>
+      </section>
+
+      <section className="trust-strip" id="beneficios"><div><Truck/><span><b>Compra simples</b><small>Pedido direto pelo WhatsApp</small></span></div><div><ShieldCheck/><span><b>Atendimento próximo</b><small>Tire suas dúvidas antes de comprar</small></span></div><div><Gift/><span><b>3 tamanhos especiais</b><small>Uma opção para cada ambiente</small></span></div><div><Heart/><span><b>Feito para celebrar</b><small>Mais aconchego para sua casa</small></span></div></section>
+
+      <section className="collection section-wrap" id="colecao"><div className="section-heading"><div><div className="eyebrow"><span/> NOSSA COLEÇÃO</div><h2>Encontre sua árvore <em>perfeita.</em></h2><p>Três tamanhos, infinitas possibilidades de criar momentos especiais.</p></div><div className="collection-side">Escolha seu tamanho favorito <span>↓</span></div></div>
+        <div className="product-grid">{products.map((p, i) => <article className={p.featured ? "product-card featured-card" : "product-card"} key={p.id}><div className="product-photo"><img src={p.image} alt={`Referência de decoração natalina para árvore de ${p.height}`}/><span className="product-tag">{p.tag}</span>{p.featured && <span className="favorite-tag"><Star size={12} fill="currentColor"/> MAIS ESCOLHIDA</span>}<span className="photo-number">0{i + 1}</span></div><div className="product-info"><div className="product-title-row"><h3>Árvore de Natal</h3><span className="product-height">{p.height}</span></div><p>{p.description}</p><div className="price-row"><div><span className="old-price">{money(p.old)}</span><strong>{money(p.price)}</strong></div><span className="price-caption">preço especial</span></div><button className="add-button" onClick={() => { add(p.id); setCartOpen(true); }}>Adicionar à sacola <Plus size={17}/></button></div></article>)}</div>
+        <p className="price-disclaimer">Imagens ilustrativas. Consulte os detalhes do produto, disponibilidade, frete e formas de pagamento no atendimento.</p>
+      </section>
+
+      <section className="story-section"><div className="story-image"><img src="https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=1200&q=85" alt="Detalhes de decoração de Natal com luzes quentes"/></div><div className="story-copy"><div className="eyebrow"><span/> MAIS QUE DECORAÇÃO</div><h2>Pequenos detalhes.<br/><em>Grandes lembranças.</em></h2><p>Tem coisa melhor do que ver a casa ganhando clima de Natal? A árvore é o ponto de encontro das histórias, dos presentes e dos momentos que aquecem o coração.</p><p>Escolha o tamanho que combina com seu espaço e comece a preparar uma temporada especial.</p><a className="text-link" href="#colecao">Ver as árvores disponíveis <ArrowRight size={17}/></a></div></section>
+
+      <section className="faq-section section-wrap" id="duvidas"><div className="faq-intro"><div className="eyebrow"><span/> PRECISA DE AJUDA?</div><h2>Ficou com <em>dúvidas?</em></h2><p>Veja algumas respostas rápidas. Se precisar, fale com a gente pelo pedido.</p></div><div className="faq-list">{[{q:"Como faço para comprar?",a:"Escolha o tamanho, adicione à sacola e avance para o pedido. Você poderá enviar os itens escolhidos pelo WhatsApp e confirmar os detalhes com o atendimento."},{q:"O valor já inclui o frete?",a:"Os valores exibidos são dos produtos. O frete e o prazo dependem do endereço e serão informados no atendimento antes de confirmar a compra."},{q:"Quais são as formas de pagamento?",a:"As opções de pagamento devem ser confirmadas diretamente com o atendimento no momento do pedido."},{q:"As árvores acompanham enfeites?",a:"As imagens são ilustrativas. Confirme com o atendimento o que acompanha cada modelo antes de finalizar seu pedido."}].map((f,i)=><div className={faqOpen===i?"faq-item faq-active":"faq-item"} key={f.q}><button onClick={() => setFaqOpen(faqOpen===i?null:i)}><span>{f.q}</span>{faqOpen===i?<Minus size={18}/>:<Plus size={18}/>}</button>{faqOpen===i&&<p>{f.a}</p>}</div>)}</div></section>
+    </main>
+
+    <footer className="site-footer"><a className="brand footer-brand" href="#inicio"><span className="brand-mark">✳</span><span>NATAL<span className="brand-light">EM CASA</span><small>UM NATAL CHEIO DE ENCANTO</small></span></a><p>Que não faltem luz, carinho e motivos para celebrar.</p><a href="#colecao">Escolha sua árvore <ArrowRight size={15}/></a><small className="copyright">© {new Date().getFullYear()} Natal em Casa. Todos os direitos reservados.</small></footer>
+
+    {cartOpen && <div className="overlay" onMouseDown={e => { if(e.target===e.currentTarget) setCartOpen(false); }}><aside className="cart-drawer"><div className="drawer-head"><div><span className="eyebrow">SUA SELEÇÃO</span><h3>Sacola de compras <span>({count})</span></h3></div><button className="icon-button" onClick={() => setCartOpen(false)} aria-label="Fechar sacola"><X/></button></div>{items.length===0?<div className="empty-cart"><ShoppingBag size={38}/><h4>Sua sacola está vazia</h4><p>Escolha sua árvore favorita e traga o encanto do Natal para casa.</p><button className="button button-dark" onClick={() => {setCartOpen(false);document.getElementById("colecao")?.scrollIntoView({behavior:"smooth"});}}>Ver coleção <ArrowRight size={16}/></button></div>:<><div className="cart-items">{items.map(p=><div className="cart-line" key={p.id}><img src={p.image} alt=""/><div className="cart-line-info"><b>Árvore de Natal</b><small>{p.height}</small><strong>{money(p.price)}</strong><div className="quantity"><button onClick={() => change(p.id,-1)} aria-label="Diminuir quantidade"><Minus size={13}/></button><span>{p.qty}</span><button onClick={() => change(p.id,1)} aria-label="Aumentar quantidade"><Plus size={13}/></button></div></div><button className="remove-item" onClick={() => setCart(c=>{const n={...c};delete n[p.id];return n;})}>Remover</button></div>)}</div><div className="cart-bottom"><div className="subtotal"><span>Subtotal dos produtos</span><strong>{money(total)}</strong></div><small>Frete e pagamento serão confirmados no atendimento.</small><button className="button button-gold full-button" onClick={() => {setCartOpen(false);setCheckoutOpen(true);}}>Continuar pedido <ArrowRight size={17}/></button><button className="continue-link" onClick={() => setCartOpen(false)}>Continuar escolhendo</button></div></>}</aside></div>}
+    {checkoutOpen && <div className="overlay" onMouseDown={e => {if(e.target===e.currentTarget)setCheckoutOpen(false);}}><div className="checkout-modal"><div className="drawer-head"><div><span className="eyebrow">QUASE LÁ!</span><h3>Seus dados para o pedido</h3></div><button className="icon-button" onClick={() => setCheckoutOpen(false)} aria-label="Fechar"><X/></button></div><p className="checkout-help">Preencha para montar sua mensagem. Você poderá revisar tudo antes de enviar pelo WhatsApp.</p><label>Seu nome<input value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})} placeholder="Como podemos te chamar?"/></label><label>Cidade / Estado<input value={customer.city} onChange={e=>setCustomer({...customer,city:e.target.value})} placeholder="Ex.: Brasília - DF"/></label><label>Observações (opcional)<textarea value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})} placeholder="Dúvidas ou detalhes do pedido"/></label><div className="checkout-total"><span>Total dos produtos</span><b>{money(total)}</b></div><button className="button button-gold full-button" disabled={!customer.name.trim()||!customer.city.trim()} onClick={checkout}>Enviar pedido pelo WhatsApp <ArrowRight size={17}/></button><small className="secure-note"><ShieldCheck size={14}/> Você confirma frete e pagamento diretamente no atendimento.</small></div></div>}
+  </div>;
 }

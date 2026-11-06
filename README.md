@@ -1,24 +1,32 @@
-# Oi Project
+# Natal em Casa 🎄
 
-oi
+Loja virtual de árvores de Natal, construída com React, TypeScript, TanStack Start e Vite.
 
-This project was built with [Lovable](https://lovable.dev).
+## Produtos
+- Árvore de Natal de 1 metro — R$ 38,90
+- Árvore de Natal de 1,50 metros — R$ 58,90
+- Árvore de Natal de 1,80 metros — R$ 98,90
 
-## Build with Lovable
+## Recursos
+- Layout responsivo para celular, tablet e desktop.
+- Vitrine com três opções, preços e chamadas para ação.
+- Sacola com inclusão, remoção e ajuste de quantidades.
+- Resumo de pedido com subtotal calculado automaticamente.
+- Formulário de identificação e montagem de mensagem para WhatsApp.
+- Perguntas frequentes, navegação por âncoras e animações com respeito a prefers-reduced-motion.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/b62d5aef-5531-4c1a-a64c-3cf51d5a3dd2).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+## Desenvolvimento
+```bash
+bun install
+bun run dev
 ```
+
+## Build
+```bash
+bun run build
+```
+
+## Antes de vender
+O checkout prepara o pedido e abre o WhatsApp para o cliente escolher o contato de atendimento. Configure um número comercial no link `https://wa.me/SEUNUMERO` quando tiver o telefone oficial. Frete, prazo, estoque, pagamento e características exatas dos produtos precisam ser confirmados com a loja; não há gateway de pagamento ou cálculo de frete conectado nesta versão.
+
+As fotografias da vitrine são ilustrativas e carregadas do Unsplash.
