@@ -4,21 +4,30 @@ import { ArrowRight, Check, ChevronDown, ChevronUp, Gift, Heart, Menu, Minus, Pl
 
 export const Route = createFileRoute("/")({ component: ChristmasStore });
 
-const products = [
-  { id: "compacta", height: "1 metro", price: 38.90, old: 59.90, tag: "PEQUENOS ESPAÇOS", description: "Um toque natalino cheio de charme para qualquer cantinho.", image: "https://images.unsplash.com/photo-1544273677-c433136021d4?auto=format&fit=crop&w=900&q=85", size: "compact" },
-  { id: "classica", height: "1,50 metros", price: 58.90, old: 89.90, tag: "A QUERIDINHA", description: "O equilíbrio perfeito para reunir todo mundo ao redor.", image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=900&q=85", size: "medium", featured: true },
-  { id: "imponente", height: "1,80 metros", price: 98.90, old: 149.90, tag: "PRESENÇA MARCANTE", description: "Mais altura, mais encanto e um cenário inesquecível.", image: "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=85", size: "tall" },
+const product = {
+  id: "arvore-natal",
+  name: "Árvore de Natal",
+  tag: "ESCOLHA SEU TAMANHO",
+  description: "Um toque natalino cheio de charme para transformar sua casa e criar momentos especiais.",
+  image: "https://images.unsplash.com/photo-1544273677-c433136021d4?auto=format&fit=crop&w=1200&q=90",
+};
+const sizes = [
+  { id: "1m", height: "1 metro", price: 38.90, old: 59.90 },
+  { id: "1-5m", height: "1,50 metros", price: 58.90, old: 89.90 },
+  { id: "1-8m", height: "1,80 metros", price: 98.90, old: 149.90 },
 ];
 const money = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function ChristmasStore() {
   const [cart, setCart] = useState<Record<string, number>>({});
+  const [selectedSize, setSelectedSize] = useState("1-5m");
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [customer, setCustomer] = useState({ name: "", city: "", note: "" });
-  const items = useMemo(() => products.filter(p => cart[p.id]).map(p => ({ ...p, qty: cart[p.id] })), [cart]);
+  const items = useMemo(() => sizes.filter(p => cart[p.id]).map(p => ({ ...p, qty: cart[p.id] })), [cart]);
+  const selected = sizes.find(p => p.id === selectedSize) ?? sizes[1];
   const total = items.reduce((sum, p) => sum + p.price * p.qty, 0);
   const count = Object.values(cart).reduce((sum, n) => sum + n, 0);
   const add = (id: string) => setCart(c => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -47,7 +56,7 @@ function ChristmasStore() {
       <section className="trust-strip" id="beneficios"><div><Truck/><span><b>Compra simples</b><small>Pedido direto pelo WhatsApp</small></span></div><div><ShieldCheck/><span><b>Atendimento próximo</b><small>Tire suas dúvidas antes de comprar</small></span></div><div><Gift/><span><b>3 tamanhos especiais</b><small>Uma opção para cada ambiente</small></span></div><div><Heart/><span><b>Feito para celebrar</b><small>Mais aconchego para sua casa</small></span></div></section>
 
       <section className="collection section-wrap" id="colecao"><div className="section-heading"><div><div className="eyebrow"><span/> NOSSA COLEÇÃO</div><h2>Encontre sua árvore <em>perfeita.</em></h2><p>Três tamanhos, infinitas possibilidades de criar momentos especiais.</p></div><div className="collection-side">Escolha seu tamanho favorito <span>↓</span></div></div>
-        <div className="product-grid">{products.map((p, i) => <article className={p.featured ? "product-card featured-card" : "product-card"} key={p.id}><div className="product-photo"><img src={p.image} alt={`Referência de decoração natalina para árvore de ${p.height}`}/><span className="product-tag">{p.tag}</span>{p.featured && <span className="favorite-tag"><Star size={12} fill="currentColor"/> MAIS ESCOLHIDA</span>}<span className="photo-number">0{i + 1}</span></div><div className="product-info"><div className="product-title-row"><h3>Árvore de Natal</h3><span className="product-height">{p.height}</span></div><p>{p.description}</p><div className="price-row"><div><span className="old-price">{money(p.old)}</span><strong>{money(p.price)}</strong></div><span className="price-caption">preço especial</span></div><button className="add-button" onClick={() => { add(p.id); setCartOpen(true); }}>Adicionar à sacola <Plus size={17}/></button></div></article>)}</div>
+        <div className="product-grid single-product-grid"><article className="product-card single-product-card"><div className="product-photo"><img src={product.image} alt="Árvore de Natal decorada em uma sala aconchegante"/><span className="product-tag">{product.tag}</span><span className="photo-number">01</span></div><div className="product-info"><div className="product-title-row"><h3>{product.name}</h3><span className="product-height">3 tamanhos</span></div><p>{product.description}</p><div className="size-picker"><span className="size-label">Selecione a altura</span><div className="size-options">{sizes.map(size => <button key={size.id} type="button" className={selectedSize === size.id ? "size-option size-option-active" : "size-option"} onClick={() => setSelectedSize(size.id)} aria-pressed={selectedSize === size.id}><span>{size.height}</span><strong>{money(size.price)}</strong></button>)}</div></div><div className="price-row selected-price-row"><div><span className="old-price">{money(selected.old)}</span><strong>{money(selected.price)}</strong></div><span className="price-caption">preço especial</span></div><button className="add-button" onClick={() => { add(selected.id); setCartOpen(true); }}>Adicionar à sacola <Plus size={17}/></button></div></article></div>
         <p className="price-disclaimer">Imagens ilustrativas. Consulte os detalhes do produto, disponibilidade, frete e formas de pagamento no atendimento.</p>
       </section>
 
